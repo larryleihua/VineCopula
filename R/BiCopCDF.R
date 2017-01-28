@@ -176,7 +176,7 @@ calcCDF <- function(u1, u2, family, par, par2) {
                        as.double(rep(0, length(u1))),
                        PACKAGE = "VineCopula")[[6]]
     } else if (family == 99) {
-      pCop <- Vectorize(CopulaOne::pGGEE_COP, c("u", "v"))
+      pCop <- Vectorize(CopulaOne::pPPPP_COP_1, c("u", "v"))
       res <- pCop(u1, u2, par, par2)
     } else if (family %in% c(104, 114, 124, 134, 204, 214, 224, 234)) {
 

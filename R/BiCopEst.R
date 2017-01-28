@@ -721,11 +721,11 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
 
           if(family == 99)
           {
-            dCop <- Vectorize(CopulaOne::dGGEE_COP, c("u", "v"))
+            dCop <- Vectorize(CopulaOne::dPPPP_COP_1, c("u", "v"))
 			den <- dCop(u=data[,1],
                         v=data[,2], 
-                        a=param[1],
-                        b=param[2])
+                        al=param[1],
+                        be=param[2])
 			cat(family, param, "\n") ### <------------------------------ debug
 			den[is.na(den)] = exp(-20)
             ll <- sum(log(den))
