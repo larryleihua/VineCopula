@@ -43,6 +43,7 @@
 #' \code{38} = rotated BB6 copula (270 degrees) \cr
 #' \code{39} = rotated BB7 copula (270 degrees) \cr
 #' \code{40} = rotated BB8 copula (270 degrees) \cr
+#' \code{99} = CopulaOne \cr
 #' \code{104} = Tawn type 1 copula \cr
 #' \code{114} = rotated Tawn type 1 copula (180 degrees) \cr
 #' \code{124} = rotated Tawn type 1 copula (90 degrees) \cr
@@ -174,6 +175,9 @@ calcCDF <- function(u1, u2, family, par, par2) {
                        as.integer(family - 30),
                        as.double(rep(0, length(u1))),
                        PACKAGE = "VineCopula")[[6]]
+    } else if (family == 99) {
+      pCop <- Vectorize(CopulaOne::pGGEE_COP, c("u", "v"))
+      res <- pCop(u1, u2, par, par2)
     } else if (family %in% c(104, 114, 124, 134, 204, 214, 224, 234)) {
 
         if (family == 104) {

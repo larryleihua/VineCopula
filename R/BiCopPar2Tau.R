@@ -464,7 +464,9 @@ calcTau <- function(family, par, par2) {
         if (inherits(tau, "try-error"))
             tau <- NA
         tau <- -tau
-    }
+    } else if(family == 99) {
+		tau <- CopulaOne::tauGGEE_COP(par, par2)
+	}
 
     ## return result
     tau

@@ -63,6 +63,7 @@
 #' \code{38} = rotated BB6 copula (270 degrees) \cr
 #' \code{39} = rotated BB7 copula (270 degrees) \cr
 #' \code{40} = rotated BB8 copula (270 degrees) \cr
+#' \code{99} = CopulaOne \cr
 #' \code{104} = Tawn type 1 copula \cr
 #' \code{114} = rotated Tawn type 1 copula (180 degrees) \cr
 #' \code{124} = rotated Tawn type 1 copula (90 degrees) \cr
@@ -263,7 +264,7 @@ BiCopEst <- function(u1, u2, family, method = "mle", se = FALSE, max.df = 30,
         if (!(family %in% c(2, 6, 7, 8, 9, 10,
                             17, 18, 19, 20,
                             27, 28, 29, 30,
-                            37, 38, 39, 40,
+                            37, 38, 39, 40, 99,
                             104, 114, 124, 134,
                             204, 214, 224, 234))) {
             theta1 <- theta
@@ -384,7 +385,10 @@ BiCopEst <- function(u1, u2, family, method = "mle", se = FALSE, max.df = 30,
                     delta <- 1
                     theta1 <- -1.001
                 } else theta1 <- -theta1
-            }
+            } else if (family == 99) {
+			      theta1 <- 0.5 # alpha for GGEE_cop
+			      delta <- 0.5 # beta for GGEE_cop
+			}
         }
 
         ## maximum likelihood optimization
@@ -450,7 +454,7 @@ BiCopEst <- function(u1, u2, family, method = "mle", se = FALSE, max.df = 30,
     obj
 }
 
-
+## Lei Hua: add CopulaOne, 12/22/2016
 ## internal version without checking and option for reduced outpout
 BiCopEst.intern <- function(u1, u2, family, method = "mle", se = TRUE, max.df = 30,
                             max.BB = list(BB1 = c(5, 6), BB6 = c(6, 6), BB7 = c(5, 6), BB8 = c(6, 1)),
@@ -550,7 +554,7 @@ BiCopEst.intern <- function(u1, u2, family, method = "mle", se = TRUE, max.df = 
         if (!(family %in% c(2, 6, 7, 8, 9, 10,
                             17, 18, 19, 20,
                             27, 28, 29, 30,
-                            37, 38, 39, 40,
+                            37, 38, 39, 40, 99,
                             104, 114, 124, 134,
                             204, 214, 224, 234))) {
             theta1 <- theta
@@ -599,7 +603,11 @@ BiCopEst.intern <- function(u1, u2, family, method = "mle", se = TRUE, max.df = 
             theta1 <- 1 + 6 * abs(tau)
             if (family %in% negfams)
                 theta1 <- - theta1
-        }
+        } else if (family == 99)	{
+			      theta1 <- 0.5 # alpha for GGEE_cop
+			      delta <- 0.5 # beta for GGEE_cop
+		}
+		
 
         ## maximum likelihood optimization
         if (family == 0) {
@@ -690,6 +698,10 @@ BiCopEst.intern <- function(u1, u2, family, method = "mle", se = TRUE, max.df = 
 # OUTPUT:
 #   out     Estimated Parameters and standard error (if se==TRUE)
 #--------------------------------------------------------------
+# Author: Lei Hua
+# Add CopulaOne for bivariate copulas 
+# Date: 2016-12-22
+# 
 # Author: Ulf Schepsmeier
 # Date: 2011-02-04
 # Version: 1.1
@@ -703,36 +715,49 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
     n <- dim(data)[1]
     if (any(is.na(weights)))
         weights <- NULL
-
-    if (family %in% c(7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40)) {
+	## family = 99 for CopulaOne
+    if (family %in% c(7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 99)) {
         t_LL <- function(param) {
 
+          if(family == 99)
+          {
+            dCop <- Vectorize(CopulaOne::dGGEE_COP, c("u", "v"))
+			den <- dCop(u=data[,1],
+                        v=data[,2], 
+                        a=param[1],
+                        b=param[2])
+			cat(family, param, "\n") ### <------------------------------ debug
+			den[is.na(den)] = exp(-20)
+            ll <- sum(log(den))
+          }else{
             if (is.null(weights)) {
-                ll <- .C("LL_mod2",
-                         as.integer(family),
-                         as.integer(n),
-                         as.double(data[, 1]),
-                         as.double(data[, 2]),
-                         as.double(param[1]),
-                         as.double(param[2]),
-                         as.double(0),
-                         PACKAGE = "VineCopula")[[7]]
+              ll <- .C("LL_mod2",
+                       as.integer(family),
+                       as.integer(n),
+                       as.double(data[, 1]),
+                       as.double(data[, 2]),
+                       as.double(param[1]),
+                       as.double(param[2]),
+                       as.double(0),
+                       PACKAGE = "VineCopula")[[7]]
             } else {
-                ll <- .C("LL_mod_seperate",
-                         as.integer(family),
-                         as.integer(n),
-                         as.double(data[, 1]),
-                         as.double(data[, 2]),
-                         as.double(param[1]),
-                         as.double(param[2]),
-                         as.double(rep(0, n)),
-                         PACKAGE = "VineCopula")[[7]] %*% weights
+              ll <- .C("LL_mod_seperate",
+                       as.integer(family),
+                       as.integer(n),
+                       as.double(data[, 1]),
+                       as.double(data[, 2]),
+                       as.double(param[1]),
+                       as.double(param[2]),
+                       as.double(rep(0, n)),
+                       PACKAGE = "VineCopula")[[7]] %*% weights
             }
-
+            
             if (is.infinite(ll) || is.na(ll) || ll < -10^250)
-                ll <- -10^250
-
+              ll <- -10^250
+            
+			
             return(ll)
+          }
         }
 
         if (family == 7 || family == 17) {
@@ -759,6 +784,9 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
         } else if (family == 30 | family == 40) {
             up <- c(-1.001, -0.001)
             low <- -pmin(max.BB$BB8, c(8, 1))
+        } else if (family == 99) {
+          up <- c(10, 10)
+          low <- c(0.1, 0.1)
         }
 
         if (se == TRUE) {
@@ -767,7 +795,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                               method = "L-BFGS-B",
                               lower = low,
                               upper = up,
-                              control = list(fnscale = -1, maxit = 500),
+                              control = list(fnscale = -1, maxit = 5000),
                               hessian = TRUE)
         } else {
             optimout <- optim(par = start.parm,
@@ -775,7 +803,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                               method = "L-BFGS-B",
                               lower = low,
                               upper = up,
-                              control = list(fnscale = -1, maxit = 500))
+                              control = list(fnscale = -1, maxit = 5000))
         }
 
     } else if (family == 2) {
@@ -841,7 +869,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                                       fn = t_LL,
                                       gr = gr_LL,
                                       method = "L-BFGS-B",
-                                      control = list(fnscale = -1, maxit = 500),
+                                      control = list(fnscale = -1, maxit = 5000),
                                       hessian = TRUE,
                                       lower = c(-0.9999, 2.0001),
                                       upper = c(0.9999, max.df))
@@ -850,7 +878,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                                       fn = t_LL,
                                       gr = gr_LL,
                                       method = "L-BFGS-B",
-                                      control = list(fnscale = -1, maxit = 500),
+                                      control = list(fnscale = -1, maxit = 5000),
                                       lower = c(-0.9999, 2.0001),
                                       upper = c(0.9999, max.df))
                 }
@@ -859,7 +887,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                     optimout <- optim(par = start.parm,
                                       fn = t_LL,
                                       method = "L-BFGS-B",
-                                      control = list(fnscale = -1, maxit = 500),
+                                      control = list(fnscale = -1, maxit = 5000),
                                       hessian = TRUE,
                                       lower = c(-0.9999, 2.0001),
                                       upper = c(0.9999, max.df))
@@ -867,7 +895,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                     optimout <- optim(par = start.parm,
                                       fn = t_LL,
                                       method = "L-BFGS-B",
-                                      control = list(fnscale = -1, maxit = 500),
+                                      control = list(fnscale = -1, maxit = 5000),
                                       lower = c(-0.9999, 2.0001),
                                       upper = c(0.9999, max.df))
                 }
@@ -1044,7 +1072,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
     out <- list()
 
     if (se == TRUE) {
-        if (family %in% c(2, 7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40)) {
+        if (family %in% c(2, 7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 99)) {
             out$par <- optimout$par
 
             if (!is.finite(det(optimout$hessian))) {
@@ -1077,7 +1105,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
             out$se <- as.numeric(sqrt(var))
         }
     } else {
-        if (family %in% c(2, 7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40)) {
+        if (family %in% c(2, 7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 99)) {
             out$par <- optimout$par
         } else {
             out$par[1] <- optimout$par[1]
@@ -1131,7 +1159,7 @@ MLE_intern_Tawn <- function(data, start.parm, family, se = FALSE) {
                           method = c("L-BFGS-B"),
                           lower = parlower,
                           upper = parupper,
-                          control = list(fnscale = -1, maxit = 500),
+                          control = list(fnscale = -1, maxit = 5000),
                           hessian = TRUE)
         if (!is.finite(det(optimout$hessian))) {
             var <- matrix(NA, 2, 2)
@@ -1149,7 +1177,7 @@ MLE_intern_Tawn <- function(data, start.parm, family, se = FALSE) {
                           method = c("L-BFGS-B"),
                           lower = parlower,
                           upper = parupper,
-                          control = list(fnscale = -1, maxit = 500))
+                          control = list(fnscale = -1, maxit = 5000))
     }
 
     ## return results

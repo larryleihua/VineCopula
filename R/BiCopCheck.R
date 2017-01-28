@@ -36,6 +36,7 @@
 #' \code{38} = rotated BB6 copula (270 degrees) \cr
 #' \code{39} = rotated BB7 copula (270 degrees) \cr
 #' \code{40} = rotated BB8 copula (270 degrees) \cr
+#' \code{99} = CopulaOne \cr
 #' \code{104} = Tawn type 1 copula \cr
 #' \code{114} = rotated Tawn type 1 copula (180 degrees) \cr
 #' \code{124} = rotated Tawn type 1 copula (90 degrees) \cr
@@ -67,14 +68,14 @@ BiCopCheck <- function(family, par, par2 = 0, ...) {
     ## check if all required parameters are set
     if (!(all(family %in% c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 14, 16, 17, 18, 19,
                             20, 23, 24, 26, 27, 28, 29, 30, 33, 34, 36, 37, 38, 39,
-                            40, 41, 42, 51, 52,  61, 62, 71, 72,
+                            40, 41, 42, 51, 52,  61, 62, 71, 72, 99,
                             104, 114, 124, 134, 204, 214, 224, 234))))
         stop("\n In ", cl, ": ",
              "Copula family not implemented.",
              call. = FALSE)
     if (any((family %in% allfams[twopar]) & (par2 == 0)))
         stop("\n In ", cl, ": ",
-             "For t-, BB1, BB6, BB7, BB8 and Tawn copulas, 'par2' must be set.",
+             "For t-, BB1, BB6, BB7, BB8, Tawn, CopulaOne copulas, 'par2' must be set.",
              call. = FALSE)
     if (length(par) < 1)
         stop("\n In ", cl, ": ",
@@ -229,6 +230,11 @@ checkPars <- function(x, cl) {
             stop("\n In ", cl, ": ",
                  "The first parameter of the two-parametric asymmetric copula has to be in the interval [limA(par2),1]",
                  call. = FALSE)
+    } else if (family == 99) {
+      if(par < 0 || par2 < 0)
+        stop("\n In ", cl, ": ",
+             "Please choose 'par' and 'par2' of the CopulaOne copula in (0,oo).",
+             call. = FALSE)
     } else if (family == 104 || family == 114 || family == 204 || family == 214) {
         if (par < 1)
             stop("\n In ", cl, ": ",
@@ -282,6 +288,10 @@ BiCopCheckTaus <- function(family, tau) {
             stop("\n In ", cl, ": ",
                  "Rotated Joe copula cannot be used for tau>0.",
                  call. = FALSE)
+        if (family == 99 && tau < 0)
+            stop("\n In ", cl, ": ",
+                 "CopulaOne cannot be used for tau<0.",
+                  call. = FALSE)
     }
     apply(cbind(family, tau), 1, checkTaus)
 

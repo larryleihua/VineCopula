@@ -3,6 +3,7 @@ import(copula)
 import(methods)
 import(lattice)
 import(network)
+import(CopulaOne)
 
 importFrom("grDevices", "colorRampPalette", "rgb", "terrain.colors", "col2rgb", "gray")
 importFrom("graphics", "abline", "box", "hist", "legend", "lines",
