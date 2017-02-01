@@ -330,7 +330,7 @@ prep_familyset <- function(args) {
 ## check if familyset has at least one family corresponding to empirical tau
 check_fam_tau <- function(args) {
     if (is.null(args$weights))
-        args$weights <- NA
+        args$weights <- NULL
     args$emp_tau <- fasttau(args$u1, args$u2, args$weights)
     if ((args$emp_tau > 0) & !any(args$familyset %in% c(0, posfams))) {
         stop("\n In ", args$call[1], ": ",
@@ -527,7 +527,7 @@ check_est_pars <- function(args) {
         args$se <- FALSE
     }
 
-    args$weights <- ifelse(is.null(args$weights), NA, args$weights)
+    args$weights <- ifelse(is.null(args$weights), NULL, args$weights) # original one changes all NULL to NA
 
     args
 }
