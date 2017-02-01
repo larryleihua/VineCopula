@@ -386,8 +386,8 @@ BiCopEst <- function(u1, u2, family, method = "mle", se = FALSE, max.df = 30,
                     theta1 <- -1.001
                 } else theta1 <- -theta1
             } else if (family == 99) {
-			      theta1 <- 0.5 # alpha for GGEE_cop
-			      delta <- 0.5 # beta for GGEE_cop
+			      theta1 <- 0.5 # alpha for CopulaOne
+			      delta <- 0.5 # beta for CopulaOne
 			}
         }
 
@@ -604,10 +604,9 @@ BiCopEst.intern <- function(u1, u2, family, method = "mle", se = TRUE, max.df = 
             if (family %in% negfams)
                 theta1 <- - theta1
         } else if (family == 99)	{
-			      theta1 <- 0.5 # alpha for GGEE_cop
-			      delta <- 0.5 # beta for GGEE_cop
+			      theta1 <- 0.5 # alpha for CopulaOne
+			      delta <- 0.5 # beta for CopulaOne
 		}
-		
 
         ## maximum likelihood optimization
         if (family == 0) {
@@ -722,7 +721,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
           if(family == 99)
           {
             dCop <- Vectorize(CopulaOne::dPPPP_COP_1, c("u", "v"))
-			den <- dCop(u=data[,1],
+			      den <- dCop(u=data[,1],
                         v=data[,2], 
                         al=param[1],
                         be=param[2])
@@ -785,7 +784,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
             up <- c(-1.001, -0.001)
             low <- -pmin(max.BB$BB8, c(8, 1))
         } else if (family == 99) {
-          up <- c(10, 10)
+          up <- c(5, 5)
           low <- c(0.1, 0.1)
         }
 
