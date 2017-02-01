@@ -527,7 +527,7 @@ check_est_pars <- function(args) {
         args$se <- FALSE
     }
 
-    args$weights <- ifelse(is.null(args$weights), NULL, args$weights) # original one changes all NULL to NA
+    args$weights <- ifelse(is.null(args$weights), , args$weights) # original one changes all NULL to NA
 
     args
 }
