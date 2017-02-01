@@ -170,7 +170,7 @@
 #' summary(cop3)
 #'
 BiCopSelect <- function(u1, u2, familyset = NA, selectioncrit = "AIC",
-                        indeptest = FALSE, level = 0.05, weights = NA,
+                        indeptest = FALSE, level = 0.05, weights = NULL,
                         rotations = TRUE, se = FALSE, presel = TRUE,
                         method = "mle") {
     if (!(selectioncrit %in% c("AIC", "BIC", "logLik")))
@@ -210,7 +210,7 @@ BiCopSelect <- function(u1, u2, familyset = NA, selectioncrit = "AIC",
                                             se = se,
                                             weights = weights,
                                             as.BiCop = FALSE)
-            if (any(is.na(weights))) {
+            if (any(is.null(weights))) {
                 lls[i] <- sum(log(BiCopPDF(u1,
                                            u2,
                                            familyset[i],

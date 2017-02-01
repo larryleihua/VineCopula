@@ -26,7 +26,7 @@
 #' # compute the empirical Kendall's taus
 #' TauMatrix(Data)
 #'
-TauMatrix <- function(data, weights = NA) {
+TauMatrix <- function(data, weights = NULL) {
     ## preprocessing of arguments
     args <- preproc(c(as.list(environment()), call = match.call()),
                     check_data,
@@ -36,7 +36,7 @@ TauMatrix <- function(data, weights = NA) {
     list2env(args, environment())
 
     data <- as.matrix(data)
-    if (any(is.na(weights))) {
+    if (any(is.null(weights))) {
         # if (any(data > 1) || any(data < 0))
         #     stop("Data has be in the interval [0,1].")
         d <- dim(data)[2]

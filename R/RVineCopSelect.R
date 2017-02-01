@@ -244,7 +244,7 @@ RVineCopSelect <- function(data, familyset = NA, Matrix, selectioncrit = "AIC", 
                                                          selectioncrit,
                                                          indeptest,
                                                          level,
-                                                         weights = NA,
+                                                         weights = NULL,
                                                          rotations,
                                                          se = se,
                                                          method = method))

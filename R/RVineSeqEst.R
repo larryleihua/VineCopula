@@ -104,7 +104,7 @@
 #'
 RVineSeqEst <- function(data, RVM, method = "mle", se = FALSE, max.df = 30,
                         max.BB = list(BB1 = c(5, 6), BB6 = c(6, 6), BB7 = c(5, 6), BB8 = c(6, 1)),
-                        progress = FALSE, weights = NA, cores = 1) {
+                        progress = FALSE, weights = NULL, cores = 1) {
     ## preprocessing of arguments
     args <- preproc(c(as.list(environment()), call = match.call()),
                     check_data,

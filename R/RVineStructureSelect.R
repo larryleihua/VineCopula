@@ -166,7 +166,7 @@
 #' RVineCopSelect(daxreturns, c(1:6), DVM$Matrix)}
 #'
 RVineStructureSelect <- function(data, familyset = NA, type = 0, selectioncrit = "AIC", indeptest = FALSE,
-                                 level = 0.05, trunclevel = NA, progress = FALSE,  weights = NA,
+                                 level = 0.05, trunclevel = NA, progress = FALSE,  weights = NULL,
                                  treecrit = "tau", se = FALSE, rotations = TRUE, method = "mle", cores = 1) {
     ## preprocessing of arguments
     args <- preproc(c(as.list(environment()), call = match.call()),
@@ -515,8 +515,8 @@ dfs <- function(adjacencyList, v, e = NULL, dfsorder = list()) {
 }
 
 # not required any longer? Use TauMatrix instead
-fasttau <- function(x, y, weights = NA) {
-    if (any(is.na(weights))) {
+fasttau <- function(x, y, weights = NULL) {
+    if (any(is.null(weights))) {
         m <- length(x)
         n <- length(y)
         if (m == 0 || n == 0)
@@ -544,7 +544,7 @@ fasttau <- function(x, y, weights = NA) {
 ## fit pair-copulas for the first vine tree
 fit.FirstTreeCopulas <- function(MST, data.univ, type, copulaSelectionBy,
                                  testForIndependence, testForIndependence.level,
-                                 se, weights = NA, method = "mle", cores = 1) {
+                                 se, weights = NULL, method = "mle", cores = 1) {
 
     ## initialize estimation results with empty list
     d <- nrow(MST$E$nums)
@@ -627,7 +627,7 @@ fit.FirstTreeCopulas <- function(MST, data.univ, type, copulaSelectionBy,
 ## fit pair-copulas for vine trees 2,...
 fit.TreeCopulas <- function(MST, oldVineGraph, type, copulaSelectionBy,
                             testForIndependence, testForIndependence.level,
-                            se = se, progress, weights = NA, method = "mle",
+                            se = se, progress, weights = NULL, method = "mle",
                             cores = 1) {
 
     ## initialize estimation results with empty list
@@ -731,7 +731,7 @@ fit.TreeCopulas <- function(MST, oldVineGraph, type, copulaSelectionBy,
 }
 
 ## initialize graph for next vine tree (possible edges)
-buildNextGraph <- function(oldVineGraph, treecrit, weights = NA, parallel,
+buildNextGraph <- function(oldVineGraph, treecrit, weights = NULL, parallel,
                            truncated = FALSE) {
 
     d <- nrow(oldVineGraph$E$nums)
@@ -871,7 +871,7 @@ pcSelect <- function(parameterForACopula, type, ...) {
 ## bivariate copula selection
 fit.ACopula <- function(u1, u2, familyset = NA, selectioncrit = "AIC",
                         indeptest = FALSE, level = 0.05, se = FALSE,
-                        weights = NA, method = "mle") {
+                        weights = NULL, method = "mle") {
 
     ## select family and estimate parameter(s) for the pair copula
     complete.i <- which(!is.na(u1 + u2))

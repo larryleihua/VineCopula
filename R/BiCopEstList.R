@@ -101,7 +101,7 @@
 #' data(daxreturns)
 #' comp <- BiCopEstList(daxreturns[, 1], daxreturns[, 4])
 #'
-BiCopEstList <- function(u1, u2, familyset = NA, weights = NA, rotations = TRUE,
+BiCopEstList <- function(u1, u2, familyset = NA, weights = NULL, rotations = TRUE,
                          ...) {
     ## preprocessing of arguments
     args <- preproc(c(as.list(environment()), list(...), call = match.call()),

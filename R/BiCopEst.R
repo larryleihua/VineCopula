@@ -160,7 +160,7 @@
 #'
 BiCopEst <- function(u1, u2, family, method = "mle", se = FALSE, max.df = 30,
                      max.BB = list(BB1 = c(5, 6), BB6 = c(6, 6), BB7 = c(5, 6), BB8 = c(6, 1)),
-                     weights = NA) {
+                     weights = NULL) {
     ## preprocessing of arguments
     args <- preproc(c(as.list(environment()), call = match.call()),
                     check_u,
@@ -458,7 +458,7 @@ BiCopEst <- function(u1, u2, family, method = "mle", se = FALSE, max.df = 30,
 ## internal version without checking and option for reduced outpout
 BiCopEst.intern <- function(u1, u2, family, method = "mle", se = TRUE, max.df = 30,
                             max.BB = list(BB1 = c(5, 6), BB6 = c(6, 6), BB7 = c(5, 6), BB8 = c(6, 1)),
-                            weights = NA, as.BiCop = TRUE) {
+                            weights = NULL, as.BiCop = TRUE) {
 
     ## calculate empirical Kendall's tau and invert for initial estimate
     tau <- fasttau(u1, u2, weights)
@@ -712,7 +712,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                        weights = NULL, cor.fixed = FALSE) {
 
     n <- dim(data)[1]
-    if (any(is.null(weights))) # original one was is.na()
+    if (any(is.null(weights))) # original one was is.na(), but is.null() for some other places, so changed to is.null() for consistency
         weights <- NULL
 	## family = 99 for CopulaOne
     if (family %in% c(7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 99)) {
@@ -1187,8 +1187,8 @@ MLE_intern_Tawn <- function(data, start.parm, family, se = FALSE) {
 
 
 
-fasttau <- function(x, y, weights = NA) {
-    if (any(is.na(weights))) {
+fasttau <- function(x, y, weights = NULL) {
+    if (any(is.null(weights))) {
         m <- length(x)
         n <- length(y)
         if (m == 0 || n == 0)
