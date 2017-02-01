@@ -712,7 +712,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                        weights = NULL, cor.fixed = FALSE) {
 
     n <- dim(data)[1]
-    if (any(is.na(weights)))
+    if (any(is.null(weights))) # original one was is.na()
         weights <- NULL
 	## family = 99 for CopulaOne
     if (family %in% c(7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 99)) {
@@ -720,7 +720,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
 
           if(family == 99)
           {
-            dCop <- Vectorize(CopulaOne::dPPPP_COP_1, c("u", "v"))
+            dCop <- CopulaOne::dPPPP_COP_1
 			      den <- dCop(u=data[,1],
                         v=data[,2], 
                         al=param[1],
