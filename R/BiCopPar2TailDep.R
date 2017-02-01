@@ -210,8 +210,13 @@ calcTD <- function(family, par, par2) {
         par2 <- 1
         lower <- par2 + par3 - 2 * ((0.5 * par2)^par + (0.5 * par3)^par)^(1/par)
         upper <- 0
-    }
-
+    } else if (family == 99) {
+		lower <- max(1-par,0)
+		upper <- max(1-par2,0)
+	} else {
+		lower <- upper <- NA # for those who are not implemented
+	}
+	
     ## return result
     c(lower, upper)
 }
