@@ -725,7 +725,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                         v=data[,2], 
                         al=param[1],
                         be=param[2])
-			cat(family, param, "\n") ### <------------------------------ debug
+			# cat(family, param, "\n") ### <------------------------------ debug
 			den[is.na(den)] = exp(-20)
             ll <- sum(log(den))
           }else{
