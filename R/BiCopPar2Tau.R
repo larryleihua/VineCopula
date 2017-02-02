@@ -466,6 +466,8 @@ calcTau <- function(family, par, par2) {
         tau <- -tau
     } else if(family == 99) {
 		tau <- CopulaOne::tauPPPP_COP(par, par2,1,1) ## a=b=1, which can be relaxed
+	} else if(family == 98) {
+		tau <- CopulaOne::tauPPPP_COP_90(par, par2,1,1) ## a=b=1, which can be relaxed
 	}
 
     ## return result

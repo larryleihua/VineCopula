@@ -64,6 +64,7 @@
 #' \code{38} = rotated BB6 copula (270 degrees) \cr
 #' \code{39} = rotated BB7 copula (270 degrees) \cr
 #' \code{40} = rotated BB8 copula (270 degrees) \cr
+#' \code{98} = CopulaOne (counter clockwise 90 degrees) \cr
 #' \code{99} = CopulaOne \cr
 #' \code{104} = Tawn type 1 copula \cr
 #' \code{114} = rotated Tawn type 1 copula (180 degrees) \cr
@@ -306,6 +307,8 @@ get_rotations <- function(fam) {
         out <- c(104, 114, 124, 134)
     } else if(fam %in% c(204, 214, 224, 234)) {
         out <- c(204, 214, 224, 234)
+    } else if(fam %in% c(99, 98)) {
+        out <- c(99, 98)
     }
 
     # adjust for negative selection

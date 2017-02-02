@@ -40,6 +40,7 @@
 #' \code{38}  \tab \code{"BB6_270"}   \tab \code{"Rotated BB6 270 degrees"} \cr
 #' \code{39}  \tab \code{"BB7_270"}   \tab \code{"Rotated BB7 270 degrees"} \cr
 #' \code{40}  \tab \code{"BB8_270"}   \tab \code{"Rotated Frank-Joe 270 degrees"} \cr
+#' \code{98}  \tab \code{"CopOne90"}  \tab \code{"CopulaOne rotated 90"} \cr
 #' \code{99}  \tab \code{"CopulaOne"} \tab \code{"CopulaOne"} \cr
 #' \code{104} \tab \code{"Tawn"}      \tab \code{"Tawn type 1"} \cr
 #' \code{114} \tab \code{"Tawn180"}   \tab \code{"Rotated Tawn type 1 180 degrees"} \cr
@@ -165,6 +166,8 @@ fam_name <- function(family, short) {
                 fam <- "1-par AS90"
             if (family == 71)
                 fam <- "1-par AS270"
+            if (family == 98)
+              fam <- "CopulaOne rotated 9"
             if (family == 99)
               fam <- "CopulaOne"
             if (family == 104)
@@ -259,6 +262,8 @@ fam_name <- function(family, short) {
                 fam <- "Rotated 1-parametric asymmetric 90 degree"
             if (family == 71)
                 fam <- "Rotated 1-parametric asymmetric 270 degree"
+            if (family == 98)
+              fam <- "Full-range tail dependence copula (rotated 90)"
             if (family == 99)
               fam <- "Full-range tail dependence copula"
             if (family == 104)
@@ -352,7 +357,9 @@ fam_name <- function(family, short) {
             fam <- 61
         if (family == "1-par AS270" || family == "Rotated 1-parametric asymmetric 270 degree")
             fam <- 71
-        if (family == "CopulaOne" || family == "Full-range tail dependence copula")
+		if (family == "CopulaOne90" || family == "Full-range tail dependence copula rotated 90 degree")
+            fam <- 98
+		if (family == "CopulaOne" || family == "Full-range tail dependence copula")
             fam <- 99
         if (family == "Tawn" || family == "Tawn type 1")
             fam <- 104

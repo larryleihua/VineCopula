@@ -213,6 +213,9 @@ calcTD <- function(family, par, par2) {
     } else if (family == 99) {
 		lower <- max(1-par,0)
 		upper <- max(1-par2,0)
+	} else if (family == 98) { # not implemented yet
+		lower <- NA
+		upper <- NA
 	} else {
 		lower <- upper <- NA # for those who are not implemented
 	}

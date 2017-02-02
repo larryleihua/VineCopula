@@ -43,6 +43,7 @@
 #' \code{38} = rotated BB6 copula (270 degrees) \cr
 #' \code{39} = rotated BB7 copula (270 degrees) \cr
 #' \code{40} = rotated BB8 copula (270 degrees) \cr
+#' \code{98} = CopulaOne (counter clockwise 90 degrees) \cr
 #' \code{99} = CopulaOne \cr
 #' \code{104} = Tawn type 1 copula \cr
 #' \code{114} = rotated Tawn type 1 copula (180 degrees) \cr
@@ -113,7 +114,10 @@ BiCopPDF <- function(u1, u2, family, par, par2 = 0, obj = NULL, check.pars = TRU
       if(family==99)
       {
         coplik <- CopulaOne::dPPPP_COP_1(u1,u2,par,par2)
-      }else
+      } else if (family == 98)
+	  {
+	    coplik <- CopulaOne::dPPPP_COP_1_90(u1,u2,par,par2)
+	  } else
       {
         # unvectorized call
         coplik <- .C("PDF_seperate",

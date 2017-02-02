@@ -36,6 +36,7 @@
 #' \code{38} = rotated BB6 copula (270 degrees) \cr
 #' \code{39} = rotated BB7 copula (270 degrees) \cr
 #' \code{40} = rotated BB8 copula (270 degrees) \cr
+#' \code{98} = CopulaOne (counter clockwise 90 degrees) \cr
 #' \code{99} = CopulaOne \cr
 #' \code{104} = Tawn type 1 copula \cr
 #' \code{114} = rotated Tawn type 1 copula (180 degrees) \cr
@@ -160,12 +161,12 @@ BiCop <- function(family, par, par2 = 0, tau = NULL, check.pars = TRUE) {
 ## sets of families
 allfams <- c(0:10,
              13, 14, 16:20,
-             23, 24, 26:30, 33, 34, 36:40, 99, # 99: CopulaOne
+             23, 24, 26:30, 33, 34, 36:40, 98, 99, # 99: CopulaOne, 98: totated CopulaOne
              104, 114, 124, 134, 204, 214, 224, 234)
 tawns <- which(allfams > 100)
 onepar <- setdiff(which(allfams %% 10 %in% c(1, 3, 4, 5, 6)), tawns)
 twopar <- seq_along(allfams)[-c(1, onepar)]
-negfams <- c(1, 2, 5, 23, 24, 26:30, 33, 34, 36:40, 124, 134, 224, 234)
+negfams <- c(1, 2, 5, 23, 24, 26:30, 33, 34, 36:40, 98, 124, 134, 224, 234)
 posfams <- c(1:10, 13, 14, 16:20, 99, 104, 114, 204, 214)
 # families with more dependence near (u, v) = (1, 1)
 fams11 <- c(13, 4, 6, 7, 17, 8, 9, 19, 10, 104, 204)

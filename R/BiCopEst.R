@@ -63,6 +63,7 @@
 #' \code{38} = rotated BB6 copula (270 degrees) \cr
 #' \code{39} = rotated BB7 copula (270 degrees) \cr
 #' \code{40} = rotated BB8 copula (270 degrees) \cr
+#' \code{98} = CopulaOne (counter clockwise 90 degrees) \cr
 #' \code{99} = CopulaOne \cr
 #' \code{104} = Tawn type 1 copula \cr
 #' \code{114} = rotated Tawn type 1 copula (180 degrees) \cr
@@ -264,7 +265,7 @@ BiCopEst <- function(u1, u2, family, method = "mle", se = FALSE, max.df = 30,
         if (!(family %in% c(2, 6, 7, 8, 9, 10,
                             17, 18, 19, 20,
                             27, 28, 29, 30,
-                            37, 38, 39, 40, 99,
+                            37, 38, 39, 40, 98, 99,
                             104, 114, 124, 134,
                             204, 214, 224, 234))) {
             theta1 <- theta
@@ -385,7 +386,7 @@ BiCopEst <- function(u1, u2, family, method = "mle", se = FALSE, max.df = 30,
                     delta <- 1
                     theta1 <- -1.001
                 } else theta1 <- -theta1
-            } else if (family == 99) {
+            } else if (family %in% c(98, 99)) {
 			      theta1 <- 0.5 # alpha for CopulaOne
 			      delta <- 0.5 # beta for CopulaOne
 			}
@@ -554,7 +555,7 @@ BiCopEst.intern <- function(u1, u2, family, method = "mle", se = TRUE, max.df = 
         if (!(family %in% c(2, 6, 7, 8, 9, 10,
                             17, 18, 19, 20,
                             27, 28, 29, 30,
-                            37, 38, 39, 40, 99,
+                            37, 38, 39, 40, 98, 99,
                             104, 114, 124, 134,
                             204, 214, 224, 234))) {
             theta1 <- theta
@@ -603,7 +604,7 @@ BiCopEst.intern <- function(u1, u2, family, method = "mle", se = TRUE, max.df = 
             theta1 <- 1 + 6 * abs(tau)
             if (family %in% negfams)
                 theta1 <- - theta1
-        } else if (family == 99)	{
+        } else if (family %in% c(98, 99))	{
 			      theta1 <- 0.5 # alpha for CopulaOne
 			      delta <- 0.5 # beta for CopulaOne
 		}
@@ -714,8 +715,8 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
     n <- dim(data)[1]
     if (any(is.null(weights))) # original one was is.na(), but is.null() for some other places, so changed to is.null() for consistency
         weights <- NULL
-	## family = 99 for CopulaOne
-    if (family %in% c(7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 99)) {
+	## family = 98/99 for CopulaOne
+    if (family %in% c(7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 98, 99)) {
         t_LL <- function(param) {
 
           if(family == 99)
@@ -725,10 +726,19 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                         v=data[,2], 
                         al=param[1],
                         be=param[2])
+			den[is.na(den)] = exp(-20)
+            ll <- sum(log(den))
+          } else if(family == 98)
+		  {
+		    dCop <- CopulaOne::dPPPP_COP_1_90
+			      den <- dCop(u=data[,1],
+                        v=data[,2], 
+                        al=param[1],
+                        be=param[2])
 			# cat(family, param, "\n") ### <------------------------------ debug
 			den[is.na(den)] = exp(-20)
             ll <- sum(log(den))
-          }else{
+		  } else{
             if (is.null(weights)) {
               ll <- .C("LL_mod2",
                        as.integer(family),
@@ -783,7 +793,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
         } else if (family == 30 | family == 40) {
             up <- c(-1.001, -0.001)
             low <- -pmin(max.BB$BB8, c(8, 1))
-        } else if (family == 99) {
+        } else if (family == 99 | family == 98) {
           up <- c(5, 5)
           low <- c(0.1, 0.1)
         }
@@ -1071,7 +1081,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
     out <- list()
 
     if (se == TRUE) {
-        if (family %in% c(2, 7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 99)) {
+        if (family %in% c(2, 7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 98, 99)) {
             out$par <- optimout$par
 
             if (!is.finite(det(optimout$hessian))) {
@@ -1104,7 +1114,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
             out$se <- as.numeric(sqrt(var))
         }
     } else {
-        if (family %in% c(2, 7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 99)) {
+        if (family %in% c(2, 7, 8, 9, 10, 17, 18, 19, 20, 27, 28, 29, 30, 37, 38, 39, 40, 98, 99)) {
             out$par <- optimout$par
         } else {
             out$par[1] <- optimout$par[1]
