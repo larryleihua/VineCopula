@@ -331,19 +331,24 @@ prep_familyset <- function(args) {
 check_fam_tau <- function(args) {
     if (is.null(args$weights))
         args$weights <- NULL
-    args$emp_tau <- fasttau(args$u1, args$u2, args$weights)
-    if ((args$emp_tau > 0) & !any(args$familyset %in% c(0, posfams))) {
-        stop("\n In ", args$call[1], ": ",
-             "Empirical Kendall's tau is positive, but familyset only ",
-             "contains families for negative dependence.",
-             call. = FALSE)
-    } else if ((args$emp_tau < 0) & !any(args$familyset %in% c(0, negfams))){
-        stop("\n In ", args$call[1], ": ",
-             "Empirical Kendall's tau is negative, but familyset only ",
-             "contains families for positive dependence.",
-             call. = FALSE)
-    }
-
+    args$emp_tau <- try(fasttau(args$u1, args$u2, args$weights), silent = TRUE)
+	if (inherits(args$emp_tau, 'try-error'))
+        args$emp_tau <- NA
+	
+    if(!is.na(args$emp_tau))
+	{
+		if ((args$emp_tau > 0) & !any(args$familyset %in% c(0, posfams))) {
+			stop("\n In ", args$call[1], ": ",
+				 "Empirical Kendall's tau is positive, but familyset only ",
+				 "contains families for negative dependence.",
+				 call. = FALSE)
+		} else if ((args$emp_tau < 0) & !any(args$familyset %in% c(0, negfams))){
+			stop("\n In ", args$call[1], ": ",
+				 "Empirical Kendall's tau is negative, but familyset only ",
+				 "contains families for positive dependence.",
+				 call. = FALSE)
+		}
+	}	
     args
 }
 
