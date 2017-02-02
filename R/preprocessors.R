@@ -366,7 +366,9 @@ todo_fams <- function(args) {
 
 todo_fams_presel <- function(args) {
     # shrink familyset based on Kendall's tau and asymmetry index
-    if (args$emp_tau > 0) {
+    if(!is.na(args$emp_tau))
+	{
+	if (args$emp_tau > 0) {
         # calculate asymetry indices
         x <- qnorm(cbind(args$u1, args$u2))
         c11 <- cor(x[(x[, 1] > 0) & (x[, 2] > 0), ])[1, 2]
@@ -407,6 +409,7 @@ todo_fams_presel <- function(args) {
     # check if any family is feasible; if not, keep all
     if (length(tmpfams) > 1)
         args$familyset <- tmpfams
+	}	
     args
 }
 
