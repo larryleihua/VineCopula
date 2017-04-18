@@ -59,6 +59,8 @@
 #' \code{38} = rotated BB6 copula (270 degrees) \cr
 #' \code{39} = rotated BB7 copula (270 degrees) \cr
 #' \code{40} = rotated BB8 copula (270 degrees) \cr
+#' \code{98} = CopulaOne (counter clockwise 90 degrees) \cr
+#' \code{99} = CopulaOne \cr
 #' \code{104} = Tawn type 1 copula \cr
 #' \code{114} = rotated Tawn type 1 copula (180 degrees) \cr
 #' \code{124} = rotated Tawn type 1 copula (90 degrees) \cr
@@ -100,7 +102,7 @@
 #' data(daxreturns)
 #' comp <- BiCopEstList(daxreturns[, 1], daxreturns[, 4])
 #'
-BiCopEstList <- function(u1, u2, familyset = NA, weights = NA, rotations = TRUE,
+BiCopEstList <- function(u1, u2, familyset = NA, weights = NULL, rotations = TRUE,
                          ...) {
     ## preprocessing of arguments
     args <- preproc(c(as.list(environment()), list(...), call = match.call()),
