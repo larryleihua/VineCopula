@@ -2,7 +2,7 @@
 % Please edit documentation in R/RVineMatrixSample.R
 \name{RVineMatrixSample}
 \alias{RVineMatrixSample}
-\title{R-Vine Matrix Sample}
+\title{Randomv sampling of R-Vine matices}
 \usage{
 RVineMatrixSample(d, size = 1, naturalOrder = FALSE)
 }
@@ -19,25 +19,26 @@ A list of length \code{size} with each element containing one
 R-Vine matrix.
 }
 \description{
-Sample R-Vine matrices.
+Sample R-Vine matrices based on the algorithm of Joe et al. (2011).
+}
+\note{
+For some reason, our implementaion of Joe et al.'s algorithm always
+returns a star in the first tree. To fix this, we sample a vine matrix of
+dimension d + 1 and remove the first tree afterwards
 }
 \examples{
-
 # Matrix and sample sizes
 d <- 10
 size <- 5
 
-# Sample in the natural order
+# Sample R-vine matrices
 RVM <- RVineMatrixSample(d, size)
 sapply(RVM, RVineMatrixCheck)
 
-# Sample without natural order
+# Sample R-vine matrices in the natural order
 RVM <- RVineMatrixSample(d, size, naturalOrder = TRUE)
 sapply(RVM, RVineMatrixCheck)
 
-}
-\author{
-Thibault Vatter
 }
 \references{
 Joe H, Cooke RM and Kurowicka D (2011). Regular vines:
@@ -47,4 +48,6 @@ Modeling: Vine Copula Handbook, pp 219--231. World Scientific, Singapore.
 \seealso{
 \code{\link{RVineMatrix}}, \code{\link{RVineMatrixCheck}}
 }
-
+\author{
+Thibault Vatter
+}

@@ -19,7 +19,6 @@
 #' # rotated Tawn T2 copula with parameters
 #' copulaFromFamilyIndex(224, -2, 0.5)
 #'
-#' @export copulaFromFamilyIndex
 copulaFromFamilyIndex <- function(family, par, par2 = 0) {
     constr <- switch(paste("fam", family, sep = ""),
                      fam0 = function(par) indepCopula(),
@@ -65,13 +64,11 @@ copulaFromFamilyIndex <- function(family, par, par2 = 0) {
     constr(c(par, par2))
 }
 
-# generic fitting make fitCopula from copula generic
-setGeneric("fitCopula", fitCopula)
 
 ####################### generic wrapper functions to the VineCopula package ##
 
 # density from BiCopPDF
-linkVineCop.PDF <- function(u, copula, log = FALSE) {
+linkVineCop.PDF <- function(u, copula, log = FALSE, ...) {
     param <- copula@parameters
 
     if (length(param) == 1)

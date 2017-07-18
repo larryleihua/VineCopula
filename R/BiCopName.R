@@ -80,7 +80,6 @@
 #' BiCopName(1:10)    # as character expression
 #' BiCopName(c("Clayton","t","J"))    # as number
 #'
-#' @export BiCopName
 BiCopName <- function(family, short = TRUE) {
     stopifnot(is.logical(short))
     sapply(family, fam_name, short = short)

@@ -1,6 +1,10 @@
-#' R-Vine Matrix Sample
+#' Randomv sampling of R-Vine matices
 #'
-#' Sample R-Vine matrices.
+#' Sample R-Vine matrices based on the algorithm of Joe et al. (2011).
+#'
+#' @note For some reason, our implementaion of Joe et al.'s algorithm always
+#' returns a star in the first tree. To fix this, we sample a vine matrix of
+#' dimension d + 1 and remove the first tree afterwards
 #'
 #' @param d Dimension of the R-Vine matrices.
 #' @param size Number of matrices to sample.
@@ -8,34 +12,39 @@
 #' (default: \code{naturalOrder = FALSE}).
 #' @return A list of length \code{size} with each element containing one
 #' R-Vine matrix.
+#'
 #' @author Thibault Vatter
+#'
 #' @seealso \code{\link{RVineMatrix}}, \code{\link{RVineMatrixCheck}}
+#'
 #' @references Joe H, Cooke RM and Kurowicka D (2011). Regular vines:
 #' generation algorithm and number of equivalence classes. In Dependence
 #' Modeling: Vine Copula Handbook, pp 219--231. World Scientific, Singapore.
-#' @examples
 #'
+#' @examples
 #' # Matrix and sample sizes
 #' d <- 10
 #' size <- 5
 #'
-#' # Sample in the natural order
+#' # Sample R-vine matrices
 #' RVM <- RVineMatrixSample(d, size)
 #' sapply(RVM, RVineMatrixCheck)
 #'
-#' # Sample without natural order
+#' # Sample R-vine matrices in the natural order
 #' RVM <- RVineMatrixSample(d, size, naturalOrder = TRUE)
 #' sapply(RVM, RVineMatrixCheck)
 #'
-#' @export RVineMatrixSample
 RVineMatrixSample <- function(d, size = 1, naturalOrder = FALSE) {
     stopifnot(d > 1)
+    ## for some reason, Joe et al.'s algorithm returns a star in the first tree.
+    ## to fix this, we sample a vine matrix of dimension d + 1 and remove the
+    ## first tree later
+    d <- d + 1
 
     ## Sample the required binary vectors
     if (d > 3) {
         sampleBvect <- lapply(4:d,
                               function(j) sampleBinaryVector(j, size, TRUE))
-        sampleRVM <- vector("list", size)
     }
 
     ## Initialize RVM
@@ -64,15 +73,29 @@ RVineMatrixSample <- function(d, size = 1, naturalOrder = FALSE) {
             RVM[selUpper] <- getRVineMatrix(b)
         }
 
-        ## Permute nodes if required
-        if (naturalOrder == FALSE) {
-            RVM <- reorderRVineMatrix(RVM, sample.int(d, d))
-        }
-
         sampleRVM[[k]] <- ToLowerTri(RVM)
     }
 
-    sampleRVM
+    ## now reduce to d-dimensional matrices again
+    d <- d - 1
+    reducedSample <- lapply(sampleRVM, function(x) x[-(d + 1), -(d + 1)])
+    reducedSample <- lapply(reducedSample, function(x) {
+        notPresent <- !is.element(1:d, x)
+        if (any(notPresent)) {
+            x[x == d + 1] <- (1:d)[notPresent]
+        }
+        x
+    })
+    ## reorder
+    if (naturalOrder == FALSE)
+    {
+        reducedSample <- lapply(reducedSample, function(x)
+            reorderRVineMatrix(x, sample.int(d, d)))
+    } else {
+        reducedSample <- lapply(reducedSample, function(x)
+            reorderRVineMatrix(x))
+    }
+    return(reducedSample)
 }
 
 getRVineMatrix <- function(b) {

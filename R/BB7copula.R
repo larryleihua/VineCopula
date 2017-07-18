@@ -45,13 +45,13 @@ NULL
 validBB7Copula = function(object) {
   if (object@dimension != 2)
     return("Only BB7 copulas of dimension 2 are supported.")
-  param <- object@parameters
-  upper <- object@param.upbnd
-  lower <- object@param.lowbnd
-  if (length(param) != length(upper))
-    return("Parameter and upper bound have non-equal length")
-  if (length(param) != length(lower))
-    return("Parameter and lower bound have non-equal length")
+    p.n <- length(object@parameters)
+    if (p.n != length(object@param.upbnd))
+        return("Parameter and upper bound have non-equal length.")
+    if (p.n != length(object@param.lowbnd))
+        return("Parameter and lower bound have non-equal length.")
+    if (p.n != length(object@param.names))
+        return("Parameter and parameter names have non-equal length.")
   else return (TRUE)
 }
 
@@ -92,7 +92,6 @@ setClass("BB7Copula",
 #' persp(r90BB7Copula(c(-1,-1.5)), dCopula, zlim = c(0,10))
 #' persp(r270BB7Copula(c(-1,-1.5)), dCopula, zlim = c(0,10))
 #'
-#' @export BB7Copula
 BB7Copula <- function (param=c(1,1)) {
   if (any(is.na(param) | param >= c(Inf, Inf) | param[1] < 1 | param[2] <= 0))
     stop(paste("Parameter values out of bounds: theta: [1,Inf), delta: (0,Inf)."))
@@ -103,15 +102,15 @@ BB7Copula <- function (param=c(1,1)) {
 
 ## density ##
 setMethod("dCopula", signature("numeric","BB7Copula"),
-          function(u, copula, log) {
-            linkVineCop.PDF(matrix(u,ncol=copula@dimension),copula, log)
+          function(u, copula, log, ...) {
+            linkVineCop.PDF(matrix(u,ncol=copula@dimension), copula, log, ...)
           })
-setMethod("dCopula", signature("matrix","BB7Copula"), function(u, copula, log) linkVineCop.PDF(u, copula, log))
+setMethod("dCopula", signature("matrix","BB7Copula"), function(u, copula, log, ...) linkVineCop.PDF(u, copula, log, ...))
 
 ## jcdf ##
 setMethod("pCopula", signature("numeric","BB7Copula"),
           function(u, copula, ...) {
-            linkVineCop.CDF(matrix(u,ncol=copula@dimension),copula)
+            linkVineCop.CDF(matrix(u,ncol=copula@dimension), copula)
           })
 setMethod("pCopula", signature("matrix","BB7Copula"), linkVineCop.CDF)
 
@@ -119,23 +118,22 @@ setMethod("pCopula", signature("matrix","BB7Copula"), linkVineCop.CDF)
 # ddu
 setMethod("dduCopula", signature("numeric","BB7Copula"),
           function(u, copula, ...) {
-            linkVineCop.ddu(matrix(u,ncol=copula@dimension),copula)
+            linkVineCop.ddu(matrix(u,ncol=copula@dimension), copula)
           })
 setMethod("dduCopula", signature("matrix","BB7Copula"), linkVineCop.ddu)
 
 # ddv
 setMethod("ddvCopula", signature("numeric","BB7Copula"),
           function(u, copula, ...) {
-            linkVineCop.ddv(matrix(u,ncol=copula@dimension),copula)
+            linkVineCop.ddv(matrix(u,ncol=copula@dimension), copula)
           })
 setMethod("ddvCopula", signature("matrix","BB7Copula"), linkVineCop.ddv)
 
 ## random number generator
 setMethod("rCopula", signature("numeric","BB7Copula"), linkVineCop.r)
 
-setMethod("tau",signature("BB7Copula"),linkVineCop.tau)
-setMethod("tailIndex",signature("BB7Copula"),linkVineCop.tailIndex)
-
+setMethod("tau",signature("BB7Copula"), linkVineCop.tau)
+setMethod("lambda",signature("BB7Copula"), linkVineCop.tailIndex)
 
 #########################
 ## BB7 survival copula ##
@@ -159,7 +157,7 @@ surBB7Copula <- function (param=c(1,1)) {
 ## density ##
 setMethod("dCopula", signature("numeric","surBB7Copula"),
           function(u, copula, log) {
-            linkVineCop.PDF(matrix(u,ncol=copula@dimension,),copula,log=log)
+            linkVineCop.PDF(matrix(u,ncol=copula@dimension),copula,log=log)
           })
 setMethod("dCopula", signature("matrix","surBB7Copula"), linkVineCop.PDF)
 
@@ -189,7 +187,7 @@ setMethod("ddvCopula", signature("matrix","surBB7Copula"), linkVineCop.ddv)
 setMethod("rCopula", signature("numeric","surBB7Copula"), linkVineCop.r)
 
 setMethod("tau",signature("surBB7Copula"),linkVineCop.tau)
-setMethod("tailIndex",signature("surBB7Copula"),linkVineCop.tailIndex)
+setMethod("lambda",signature("surBB7Copula"),linkVineCop.tailIndex)
 
 ###################
 ## BB7 copula 90 ##
@@ -202,9 +200,11 @@ validRotBB7Copula = function(object) {
   upper <- object@param.upbnd
   lower <- object@param.lowbnd
   if (length(param) != length(upper))
-    return("Parameter and upper bound have non-equal length")
+    return("Parameter and upper bound have non-equal length.")
   if (length(param) != length(lower))
-    return("Parameter and lower bound have non-equal length")
+    return("Parameter and lower bound have non-equal length.")
+  if (length(param) != length(object@param.names))
+      return("Parameter and parameter names have non-equal length.")
   if (any(is.na(param) | param[1] > upper[1] | param[2] >= upper[2] | param <= lower))
     return("Parameter value out of bound")
   else return (TRUE)
@@ -258,7 +258,7 @@ setMethod("ddvCopula", signature("matrix","r90BB7Copula"), linkVineCop.ddv)
 setMethod("rCopula", signature("numeric","r90BB7Copula"), linkVineCop.r)
 
 setMethod("tau",signature("r90BB7Copula"),linkVineCop.tau)
-setMethod("tailIndex",signature("r90BB7Copula"),linkVineCop.tailIndex)
+setMethod("lambda",signature("r90BB7Copula"),linkVineCop.tailIndex)
 
 ########################
 ## BB7 copula 270 deg ##
@@ -312,4 +312,4 @@ setMethod("ddvCopula", signature("matrix","r270BB7Copula"), linkVineCop.ddv)
 setMethod("rCopula", signature("numeric","r270BB7Copula"), linkVineCop.r)
 
 setMethod("tau",signature("r270BB7Copula"),linkVineCop.tau)
-setMethod("tailIndex",signature("r270BB7Copula"),linkVineCop.tailIndex)
+setMethod("lambda",signature("r270BB7Copula"),linkVineCop.tailIndex)
