@@ -218,6 +218,10 @@ RVineStructureSelect <- function(data, familyset = NA, type = 0, selectioncrit =
     ## estimation in first tree ----------------------------
     # find optimal tree
     g <- initializeFirstGraph(data, treecrit, weights)
+      
+    # debug
+    # print(list("g <- initializeFirstGraph", g))
+      
     MST <- findMaxTree(g, mode = type)
 
     ## register parallel backend
@@ -243,7 +247,10 @@ RVineStructureSelect <- function(data, familyset = NA, type = 0, selectioncrit =
                                      weights = weights,
                                      method = method,
                                      cores = cores)
-    # store results
+    # debug
+	# print(VineTree)
+	
+	# store results
     if (!is.null(VineTree$warn))
         warn <- VineTree$warn
     RVine$Tree[[1]] <- VineTree
@@ -262,7 +269,13 @@ RVineStructureSelect <- function(data, familyset = NA, type = 0, selectioncrit =
         # find optimal tree
         g <- buildNextGraph(VineTree, weights, treecrit = treecrit, cores > 1,
                             truncated = trunclevel < tree)
+        # debug
+        print(list("g",g))
+        
         MST <- findMaxTree(g, mode = type, truncated = trunclevel < tree)
+		    # debug
+		    # print(list("MST", MST))
+
         # estimate pair-copulas
         VineTree <- fit.TreeCopulas(MST,
                                     VineTree,
@@ -388,6 +401,9 @@ initializeFirstGraph <- function(data, treecrit, weights) {
     edge.ws <- apply(all.pairs, 2,
                      function(ind)
                          treecrit(data[, ind[1]], data[, ind[2]], weights))
+    # debug
+    print(list("initializeFirstGraph::edge.ws ", edge.ws, weights))                   
+                       
     # number of pairwise complete observations / all observations
     rel.nobs <- apply(all.pairs, 2,
                       function(ind)
@@ -411,6 +427,9 @@ findMaxTree <- function(g, mode = "RVine", truncated = FALSE) {
         ## construct adjency matrix
         A <- adjacencyMatrix(g)
         d <- ncol(A)
+        
+        # debug
+        print(list("findMaxTree", A, d))
 
         if (mode == "RVine") {
             ## initialize
@@ -554,6 +573,10 @@ fit.FirstTreeCopulas <- function(MST, data.univ, type, copulaSelectionBy,
     for (i in 1:d) {
         ## get edge and corresponding data
         a <- MST$E$nums[i, ]
+		# debug
+		# cat("fit.FirstTreeCopulas: ", d, i, a, "\n")
+		
+		
         pc.data[[i]]$zr1 <- data.univ[, a[1]]
         pc.data[[i]]$zr2 <- data.univ[, a[2]]
         #         MST$E$Copula.Data.1[i] <- list(data.univ[, a[1]])
@@ -636,9 +659,13 @@ fit.TreeCopulas <- function(MST, oldVineGraph, type, copulaSelectionBy,
 
     ## prepare for estimation
     for (i in 1:d) {
+		# debug
+		cat("fit.TreeCopulas: ", d, i, "\n")
+
         ## get edge and corresponding data
         con <- MST$E$nums[i, ]
         temp <- oldVineGraph$E$nums[con, ]
+
 
         ## fetch corresponding data and names
         if ((temp[1, 1] == temp[2, 1]) || (temp[1, 2] == temp[2, 1])) {
@@ -761,6 +788,9 @@ buildNextGraph <- function(oldVineGraph, treecrit, weights = NA, parallel,
                       weights = weights,
                       truncated = truncated)
     }
+  
+  # debug
+  print(list("buildNextGraph ", out))
 
     ## annotate graph (same order as in old version of this function)
     g$E$weights         <- sapply(out, function(x) x$w)
@@ -774,7 +804,7 @@ buildNextGraph <- function(oldVineGraph, treecrit, weights = NA, parallel,
 }
 
 ## function for obtaining edge information
-getEdgeInfo <- function(i, g, oldVineGraph, treecrit, weights,
+getEdgeInfo <- function(i, g, oldVineGraph, treecrit, weights=NA,
                         truncated = FALSE) {
 
     ## get edge
@@ -834,7 +864,7 @@ getEdgeInfo <- function(i, g, oldVineGraph, treecrit, weights,
             ## calculate Kendall's tau
             keine_nas <- !(is.na(zr1a) | is.na(zr2a))
             w <- treecrit(zr1a[keine_nas], zr2a[keine_nas], weights)
-
+          
             ## get names
             name.node1 <- strsplit(g$V$names[con[1]], split = " *[,;] *")[[1]]
             name.node2 <- strsplit(g$V$names[con[2]], split = " *[,;] *")[[1]]
@@ -1108,7 +1138,7 @@ makeFullGraph <- function(d) {
                   conditioningSet = NULL),
          E = list(nums = E,
                   names = NULL,
-                  weights = NULL,
+                  weights = NA,                           # Lei Hua, April 2017, original one was NULL 
                   conditionedSet = E,
                   conditioningSet = NULL))
 }

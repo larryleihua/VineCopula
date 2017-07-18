@@ -622,6 +622,9 @@ BiCopEst.intern <- function(u1, u2, family, method = "mle", se = TRUE, max.df = 
                               max.df,
                               max.BB,
                               weights)
+			# debug
+			# cat(family, out$value, out$par, "\n")
+			
             theta <- out$par
             if (se == TRUE)
                 se1 <- out$se
@@ -726,6 +729,7 @@ MLE_intern <- function(data, start.parm, family, se = FALSE, max.df = 30,
                         v=data[,2], 
                         al=param[1],
                         be=param[2])
+			# cat(family, param, den, "\n") ### <------------------------------ debug
 			den[is.na(den)] = exp(-20)
             ll <- sum(log(den))
           } else if(family == 98)
@@ -1197,8 +1201,8 @@ MLE_intern_Tawn <- function(data, start.parm, family, se = FALSE) {
 
 
 
-fasttau <- function(x, y, weights = NULL) {
-    if (any(is.null(weights))) {
+fasttau <- function(x, y, weights = NA) {
+    if (any(is.na(weights))) {
         m <- length(x)
         n <- length(y)
         if (m == 0 || n == 0)

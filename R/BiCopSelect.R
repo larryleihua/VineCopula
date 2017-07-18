@@ -190,6 +190,7 @@ BiCopSelect <- function(u1, u2, familyset = NA, selectioncrit = "AIC",
                     check_fam_tau,
                     todo_fams,
                     na.txt = " Only complete observations are used.")
+        
     list2env(args, environment())
 
     # perform independence test
@@ -211,20 +212,29 @@ BiCopSelect <- function(u1, u2, familyset = NA, selectioncrit = "AIC",
                                             se = se,
                                             weights = weights,
                                             as.BiCop = FALSE)
-            if (any(is.null(weights))) {
-                lls[i] <- sum(log(BiCopPDF(u1,
+            if (any(is.null(weights), is.na(weights))) {
+			# debug
+			# cat(i, u1, u2, familyset[i], optiout[[i]]$par, optiout[[i]]$par2, "\n")
+            
+				lls[i] <- sum(log(BiCopPDF(u1,
                                            u2,
                                            familyset[i],
                                            optiout[[i]]$par,
                                            optiout[[i]]$par2,
                                            check.pars = FALSE)))
+										   
             } else {
+			# debug
+			# cat(i, weights, familyset[i], optiout[[i]]$par, optiout[[i]]$par2, "\n")
+			
                 lls[i] <- sum(log(BiCopPDF(u1,
                                            u2,
                                            familyset[i],
                                            optiout[[i]]$par,
                                            optiout[[i]]$par2,
                                            check.pars = FALSE)) %*% weights)
+			
+										   
             }
             npars <- ifelse(familyset[i] %in% allfams[onepar], 1, 2)
             if (familyset[i] == 0)
